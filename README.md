@@ -20,3 +20,5 @@ It will output in the same folder with "r_" instead of "n_" in the file name.
 * OpenCV
 * Cuda 8+ (nvcc in path)
 
+# Notes
+This is very specific for our purpose of remapping our colours (after post processing) to cityscapes, not much is done for extendability.
