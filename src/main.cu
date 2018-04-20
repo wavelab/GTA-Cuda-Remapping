@@ -13,6 +13,10 @@
 #include <mutex>
 #include <queue>
 #include <boost/lockfree/queue.hpp>
+#include <unordered_map>
+#include <vector>
+
+#include "ecuda/ecuda.hpp"
 
 #include "GpuMat.cuh"
 #include "GpuVector.cuh"
@@ -44,7 +48,7 @@ bool hasEnding (std::string const &fullString, std::string const &ending) {
     }
 }
 
-void processFiles(std::vector<std::string> files, std::string image_path, std::string output_path, std::string outfile)
+void processFiles(std::vector<std::string> files, std::string image_path, std::string output_path, ecuda::vector<std::pair<int,int>>* d_map, std::string outfile)
 {
 	cudaSetDevice(device);
 	auto& fout = std::cout;
@@ -54,7 +58,7 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 
 	float readTime = 0.f;
 
-	auto startTime = std::chrono::high_resolution_clock::now(); //to beat 58 s
+	auto startTime = std::chrono::high_resolution_clock::now();
 	for(int i = 0; i < files.size(); i++)
 	{
 		auto readStart = std::chrono::high_resolution_clock::now();
@@ -74,14 +78,18 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 		auto readEnd = std::chrono::high_resolution_clock::now();
-
 		if(i == 0)
 		{
 			scratchGpuMat = std::unique_ptr<GpuMat<unsigned char>>(new GpuMat<unsigned char>(img.rows, img.cols, img.channels(), false));//do this to allocate memory
 			outputImg = std::unique_ptr<GpuMat<unsigned char>>(new GpuMat<unsigned char>(img.rows, img.cols, img.channels(), false));
 		}
+		if(img.rows != scratchGpuMat->height || img.cols != scratchGpuMat->width || img.channels() != scratchGpuMat->depth)
+		{
+			fout << "skipping " << files[i] << std::endl;
+			continue;
+		}
 		scratchGpuMat->load(img);
-		scratchGpuMat->mapColours(*outputImg); //(GpuMat<dtype>& to, GpuVector<dtype>& map)
+		scratchGpuMat->mapColours(*outputImg, *d_map); //(GpuMat<dtype>& to, GpuVector<dtype>& map)
 		
 		cv::Mat outMat = outputImg->getMat();
 
@@ -147,11 +155,13 @@ std::vector<std::string> GetImagesToProcess(std::string& inputPath, std::string&
 /**
  * contains cuda specific initializations
  */
+
 int main(int argc, char** argv )
 {	
 	// grab the arguments
 	std::string image_path;
 	std::string output_path;
+	std::string mapFile;
 	int numProc = 8;
 	std::vector<int> availGpu = {0,1,2};
 	for (int i = 0; i < argc; i++)
@@ -162,6 +172,8 @@ int main(int argc, char** argv )
 			output_path = argv[i+1];
 		if (strcmp(argv[i], "-n") == 0)
 			numProc = atoi(argv[i+1]);
+		if (strcmp(argv[i], "-m") == 0)
+			mapFile = argv[i+1];
 	}
 
 	// std::vector<std::string> all_files;
@@ -177,7 +189,12 @@ int main(int argc, char** argv )
 	// std::cout << "found " << all_files.size() << " images" << std::endl;
 
 	// std::vector<std::vector<std::string>> chunks = SplitVector(all_files, numProc);
+
 	cudaSetDevice(device);
+
+	std::vector<std::pair<int,int>> map = makeMap(mapFile);
+	ecuda::vector<std::pair<int,int>> d_map(map.size());
+	ecuda::copy(map.begin(), map.end(), d_map.begin());
 
 	for(;;)
 	{
@@ -192,16 +209,19 @@ int main(int argc, char** argv )
 			{
 				std::stringstream ss;
 				ss << i << ".out";
-				threads.push_back(std::thread(processFiles, chunks[i], image_path, output_path, ss.str()));
+				std::string temp = ss.str();
+				threads.push_back(std::thread(processFiles, chunks[i], image_path, output_path, &d_map, temp));
 			}
 
 			for(std::thread& t : threads)
 			{
 				t.join();
 			}
+
+			//processFiles(toProcess, image_path, output_path, d_map, "out");
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 	}
 
-	//return 0;
+	//return 0; //unreachable
 }

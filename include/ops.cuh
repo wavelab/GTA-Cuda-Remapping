@@ -111,63 +111,29 @@ namespace ops
     }
 
     template<typename dtype> __global__
-    void mapColours(dtype* from, dtype* to, int N)
+    void mapColours(dtype* from, dtype* to, typename ecuda::vector<std::pair<int, int>>::kernel_argument d_map, int N)
     {
         CUDA_1D_KERNEL_LOOP(i, N)
         {
             if(i % 3 == 0)
             {
-                int b = from[i];
-                int g = from[i+1];
-                int r = from[i+2];
+                dtype b = from[i];
+                dtype g = from[i+1];
+                dtype r = from[i+2];
                 int ind = RGB(r,g,b);//((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
-                int new_ind;
-                switch(ind)
+                int new_ind = 0;
+                for(int j = 0; j < d_map.size(); j++)
                 {
-                    case Dont_care_old: new_ind = Dont_care_new; break;
-                    case bridge_old: new_ind = bridge_new; break;
-                    case building_old: new_ind = building_new; break;
-                    case construction_barrel_old: new_ind = construction_barrel_new; break;
-                    case construction_barricade_old: new_ind = construction_barricade_new; break;
-                    case crosswalk_old: new_ind = crosswalk_new; break;
-                    case curb_old: new_ind = curb_new; break;
-                    case white_old: new_ind = white_new; break;
-                    case debris_old: new_ind = debris_new; break;
-                    case fence_old: new_ind = fence_new; break;
-                    case guard_rail_old: new_ind = guard_rail_new; break;
-                    case lane_separator_old: new_ind = lane_separator_new; break;
-                    case pavement_marking_old: new_ind = pavement_marking_new; break;
-                    case rail_track_old: new_ind = rail_track_new; break;
-                    case road_old: new_ind = road_new; break;
-                    case roadside_structure_old: new_ind = roadside_structure_new; break;
-                    case rumble_strip_old: new_ind = rumble_strip_new; break;
-                    case sidewalk_old: new_ind = sidewalk_new; break;
-                    case terrain_old: new_ind = terrain_new; break;
-                    case traffic_cone_old: new_ind = traffic_cone_new; break;
-                    case traffic_light_old: new_ind = traffic_light_new; break;
-                    case traffic_marker_old: new_ind = traffic_marker_new; break;
-                    case traffic_sign_old: new_ind = traffic_sign_new; break;
-                    case tunnel_old: new_ind = tunnel_new; break;
-                    case utility_pole_old: new_ind = utility_pole_new; break;
-                    case vegetation_old: new_ind = vegetation_new; break;
-                    case wall_old: new_ind = wall_new; break;
-                    case Car_old: new_ind = Car_new; break;
-                    case Trailer_old: new_ind = Trailer_new; break;
-                    case Bus_old: new_ind = Bus_new; break;
-                    case Truck_old: new_ind = Truck_new; break;
-                    case Airplane_old: new_ind = Airplane_new; break;
-                    case Moterbike_old: new_ind = Moterbike_new; break;
-                    case Bycicle_old: new_ind = Bycicle_new; break;
-                    case Boat_old: new_ind = Boat_new; break;
-                    //case Railed_old: new_ind = Railed_new; break;
-                    case Pedestrian_old: new_ind = Pedestrian_new; break;
-                    case Animal_old: new_ind = Animal_new; break;
-                    default: new_ind = 0;
+                    if(d_map[j].first == ind)
+                    {
+                        new_ind = d_map[j].second;
+                        break;
+                    }
                 }
 
-                to[i] = (new_ind);
-                to[i+1] = (new_ind);
-                to[i+2] = (new_ind);
+                to[i] = GET_B(new_ind);
+                to[i+1] = GET_G(new_ind);
+                to[i+2] = GET_R(new_ind);
             }
         }
     }

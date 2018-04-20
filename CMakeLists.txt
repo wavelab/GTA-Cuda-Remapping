@@ -21,6 +21,7 @@ set(MAIN_SRC
 	"src/main.cu"
 )
 include_directories("include")
+include_directories("ecuda/include")
 include_directories(${OpenCV_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS})
 
 cuda_add_executable(Remapping ${MAIN_SRC})

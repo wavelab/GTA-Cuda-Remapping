@@ -3,6 +3,8 @@
 #include <cuda.h>
 #include <opencv2/opencv.hpp>
 
+#include "ecuda/ecuda.hpp"
+
 #include "helpers.cuh"
 #include "ops.cuh"
 #include "GpuVector.cuh"
@@ -95,10 +97,10 @@ public:
         gpuErrchk( cudaDeviceSynchronize() );
     }
 
-    void mapColours(GpuMat<dtype>& to)
+    void mapColours(GpuMat<dtype>& to, ecuda::vector<std::pair<int,int>>& d_map)
     {
         //void mapColours(dtype* from, dtype* to, dtype* map, int N)
-        LAUNCH(ops::mapColours<dtype>)(gpu_data, to.gpu_data, numElem);
+        LAUNCH(ops::mapColours<dtype>)(gpu_data, to.gpu_data, d_map, numElem);
         gpuErrchk( cudaPeekAtLastError() );
         gpuErrchk( cudaDeviceSynchronize() );
     }

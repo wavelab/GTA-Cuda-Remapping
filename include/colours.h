@@ -1,9 +1,24 @@
 #pragma once
 
+#include <fstream>
+#include <vector>
+#include <string>
+
 #define RGB(rv, gv, bv) ((((rv) & 0xFF) << 16) | (((gv) & 0xFF) << 8) | ((bv) & 0xFF))
 #define GET_R(rv) (((rv) >> 16) & 0xFF)
 #define GET_G(gv) (((gv) >> 8) & 0xFF)
 #define GET_B(bv) ((bv) & 0xFF)
+std::vector<std::pair<int,int>> makeMap(std::string file)
+{
+    std::vector<std::pair<int,int>> ret;
+    std::ifstream infile(file);
+    int fromR, fromG, fromB, toR, toG, toB;
+    while(infile >> fromR >> fromG >> fromB >> toR >> toG >> toB)
+    {
+        ret.push_back(std::pair<int,int>(RGB(fromR, fromG, fromB), RGB(toR, toG, toB)));
+    }
+    return ret;
+}
 
 // #define cs_unlabeled  RGB(0,0,0)
 // #define cs_ego_vehicle  RGB(0,0,0)
@@ -118,101 +133,104 @@
 // #define Pedestrian_new cs_person
 // #define Animal_new cs_unlabeled
 
-const unsigned int cs_road = 0;
-const unsigned int cs_sidewalk = 1;
-const unsigned int cs_building = 2;
-const unsigned int cs_wall = 3;
-const unsigned int cs_fence = 4;
-const unsigned int cs_pole = 5;
-const unsigned int cs_traffic_light = 6;
-const unsigned int cs_traffic_sign = 7;
-const unsigned int cs_vegetation = 8;
-const unsigned int cs_terrain = 9;
-const unsigned int cs_sky = 10;
-const unsigned int cs_person = 11;
-const unsigned int cs_rider = 12;
-const unsigned int cs_car = 13;
-const unsigned int cs_truck = 14;
-const unsigned int cs_bus = 15;
-const unsigned int cs_train = 16;
-const unsigned int cs_motorcycle = 17;
-const unsigned int cs_bicycle = 18;
-const unsigned int cs_unlabeled = 255;
+// const unsigned int cs_road = 0;
+// const unsigned int cs_sidewalk = 1;
+// const unsigned int cs_building = 2;
+// const unsigned int cs_wall = 3;
+// const unsigned int cs_fence = 4;
+// const unsigned int cs_pole = 5;
+// const unsigned int cs_traffic_light = 6;
+// const unsigned int cs_traffic_sign = 7;
+// const unsigned int cs_vegetation = 8;
+// const unsigned int cs_terrain = 9;
+// const unsigned int cs_sky = 10;
+// const unsigned int cs_person = 11;
+// const unsigned int cs_rider = 12;
+// const unsigned int cs_car = 13;
+// const unsigned int cs_truck = 14;
+// const unsigned int cs_bus = 15;
+// const unsigned int cs_train = 16;
+// const unsigned int cs_motorcycle = 17;
+// const unsigned int cs_bicycle = 18;
+// const unsigned int cs_unlabeled = 255;
 
-const unsigned int Dont_care_old = RGB(0,0,0);
-const unsigned int bridge_old = RGB(0,0,255);
-const unsigned int building_old = RGB(0,255,0);
-const unsigned int construction_barrel_old = RGB(0,255,255);
-const unsigned int construction_barricade_old = RGB(255,0,0);
-const unsigned int crosswalk_old = RGB(255,0,255);
-const unsigned int curb_old = RGB(255,255,0);
-const unsigned int white_old = RGB(255,255,255);
-const unsigned int debris_old = RGB(41,41,41);
-const unsigned int fence_old = RGB(156,41,41);
-const unsigned int guard_rail_old = RGB(99,99,41);
-const unsigned int lane_separator_old = RGB(214,99,41);
-const unsigned int pavement_marking_old = RGB(41,156,41);
-const unsigned int rail_track_old = RGB(156,156,41);
-const unsigned int road_old = RGB(99,214,41);
-const unsigned int roadside_structure_old = RGB(214,214,41);
-const unsigned int rumble_strip_old = RGB(214,41,99);
-const unsigned int sidewalk_old = RGB(41,99,99);
-const unsigned int terrain_old = RGB(156,99,99);
-const unsigned int traffic_cone_old = RGB(99,156,99);
-const unsigned int traffic_light_old = RGB(214,156,99);
-const unsigned int traffic_marker_old = RGB(41,214,99);
-const unsigned int traffic_sign_old = RGB(156,214,99);
-const unsigned int tunnel_old = RGB(41,41,156);
-const unsigned int utility_pole_old = RGB(156,41,156);
-const unsigned int vegetation_old = RGB(99,99,156);
-const unsigned int wall_old = RGB(214,99,156);
-const unsigned int Car_old = RGB(41,156,156);
-const unsigned int Trailer_old = RGB(156,156,156);
-const unsigned int Bus_old = RGB(99,214,156);
-const unsigned int Truck_old = RGB(214,214,156);
-const unsigned int Airplane_old = RGB(99,41,214);
-const unsigned int Moterbike_old = RGB(41,99,214);
-const unsigned int Bycicle_old = RGB(156,99,214);
-const unsigned int Boat_old = RGB(99,156,214);
-const unsigned int Railed_old = RGB(214,156,214);
-const unsigned int Pedestrian_old = RGB(214,156,214);
-const unsigned int Animal_old = RGB(156,214,214);
+// const unsigned int Dont_care_old = RGB(0,0,0);
+// const unsigned int bridge_old = RGB(0,0,255);
+// const unsigned int building_old = RGB(0,255,0);
+// const unsigned int construction_barrel_old = RGB(0,255,255);
+// const unsigned int construction_barricade_old = RGB(255,0,0);
+// const unsigned int crosswalk_old = RGB(255,0,255);
+// const unsigned int curb_old = RGB(255,255,0);
+// const unsigned int white_old = RGB(255,255,255);
+// const unsigned int debris_old = RGB(41,41,41);
+// const unsigned int fence_old = RGB(156,41,41);
+// const unsigned int guard_rail_old = RGB(99,99,41);
+// const unsigned int lane_separator_old = RGB(214,99,41);
+// const unsigned int pavement_marking_old = RGB(41,156,41);
+// const unsigned int rail_track_old = RGB(156,156,41);
+// const unsigned int road_old = RGB(99,214,41);
+// const unsigned int roadside_structure_old = RGB(214,214,41);
+// const unsigned int rumble_strip_old = RGB(99,41,99);
+// const unsigned int sidewalk_old = RGB(214,41,99);
+// const unsigned int terrain_old = RGB(41,99,99);
+// const unsigned int traffic_cone_old = RGB(156,99,99);
+// const unsigned int traffic_light_old = RGB(99,156,99);
+// const unsigned int traffic_marker_old = RGB(214,156,99);
+// const unsigned int traffic_sign_old = RGB(41,214,99);
+// const unsigned int tunnel_old = RGB(156,214,99);
+// const unsigned int utility_pole_old = RGB(41,41,156);
+// const unsigned int vegetation_old = RGB(156,41,156);
+// const unsigned int wall_old = RGB(99,99,156);
+// const unsigned int Car_old = RGB(214,99,156);
+// const unsigned int Trailer_old = RGB(41,156,156);
+// const unsigned int Bus_old = RGB(156,156,156);
+// const unsigned int Truck_old = RGB(99,214,156);
+// const unsigned int Airplane_old = RGB(214,214,156);
+// const unsigned int Moterbike_old = RGB(99,41,214);
+// const unsigned int Bycicle_old = RGB(41,99,214);
+// const unsigned int Boat_old = RGB(156,99,214);
+// const unsigned int Railed_old = RGB(99,156,214);
+// const unsigned int Pedestrian_old = RGB(214,156,214);
+// const unsigned int Animal_old = RGB(156,214,214);
+// const unsigned int Sky_old = RGB(0,0,234);
 
-const unsigned int Dont_care_new = cs_unlabeled;
-const unsigned int bridge_new = cs_unlabeled;
-const unsigned int building_new = cs_building;
-const unsigned int construction_barrel_new = cs_unlabeled;
-const unsigned int construction_barricade_new = cs_unlabeled;
-const unsigned int crosswalk_new = cs_road;
-const unsigned int curb_new = cs_sidewalk;
-const unsigned int white_new = cs_unlabeled;
-const unsigned int debris_new = cs_unlabeled;
-const unsigned int fence_new = cs_fence;
-const unsigned int guard_rail_new = cs_wall;
-const unsigned int lane_separator_new = cs_road;
-const unsigned int pavement_marking_new = cs_road;
-const unsigned int rail_track_new = cs_unlabeled;
-const unsigned int road_new = cs_road;
-const unsigned int roadside_structure_new = cs_unlabeled;
-const unsigned int rumble_strip_new = cs_road;
-const unsigned int sidewalk_new = cs_sidewalk;
-const unsigned int terrain_new = cs_terrain;
-const unsigned int traffic_cone_new = cs_unlabeled;
-const unsigned int traffic_light_new = cs_traffic_light;
-const unsigned int traffic_marker_new = cs_unlabeled;
-const unsigned int traffic_sign_new = cs_traffic_sign;
-const unsigned int tunnel_new = cs_wall;
-const unsigned int utility_pole_new = cs_pole;
-const unsigned int vegetation_new = cs_vegetation;
-const unsigned int wall_new = cs_wall;
-const unsigned int Car_new = cs_car;
-const unsigned int Trailer_new = cs_truck;
-const unsigned int Bus_new = cs_bus;
-const unsigned int Truck_new = cs_truck;
-const unsigned int Airplane_new = cs_unlabeled;
-const unsigned int Moterbike_new = cs_motorcycle;
-const unsigned int Bycicle_new = cs_bicycle;
-const unsigned int Boat_new = cs_unlabeled;
-const unsigned int Railed_new = cs_unlabeled;
-const unsigned int Pedestrian_new = cs_person;
-const unsigned int Animal_new = cs_unlabeled;
+// const unsigned int Dont_care_new = cs_unlabeled;
+// const unsigned int bridge_new = cs_unlabeled;
+// const unsigned int building_new = cs_building;
+// const unsigned int construction_barrel_new = cs_unlabeled;
+// const unsigned int construction_barricade_new = cs_unlabeled;
+// const unsigned int crosswalk_new = cs_road;
+// const unsigned int curb_new = cs_sidewalk;
+// const unsigned int white_new = cs_unlabeled;
+// const unsigned int debris_new = cs_unlabeled;
+// const unsigned int fence_new = cs_fence;
+// const unsigned int guard_rail_new = cs_wall;
+// const unsigned int lane_separator_new = cs_road;
+// const unsigned int pavement_marking_new = cs_road;
+// const unsigned int rail_track_new = cs_unlabeled;
+// const unsigned int road_new = cs_road;
+// const unsigned int roadside_structure_new = cs_unlabeled;
+// const unsigned int rumble_strip_new = cs_road;
+// const unsigned int sidewalk_new = cs_sidewalk;
+// const unsigned int terrain_new = cs_terrain;
+// const unsigned int traffic_cone_new = cs_unlabeled;
+// const unsigned int traffic_light_new = cs_traffic_light;
+// const unsigned int traffic_marker_new = cs_unlabeled;
+// const unsigned int traffic_sign_new = cs_traffic_sign;
+// const unsigned int tunnel_new = cs_wall;
+// const unsigned int utility_pole_new = cs_pole;
+// const unsigned int vegetation_new = cs_vegetation;
+// const unsigned int wall_new = cs_wall;
+// const unsigned int Car_new = cs_car;
+// const unsigned int Trailer_new = cs_truck;
+// const unsigned int Bus_new = cs_bus;
+// const unsigned int Truck_new = cs_truck;
+// const unsigned int Airplane_new = cs_unlabeled;
+// const unsigned int Moterbike_new = cs_motorcycle;
+// const unsigned int Bycicle_new = cs_bicycle;
+// const unsigned int Boat_new = cs_unlabeled;
+// const unsigned int Railed_new = cs_train;
+// const unsigned int Pedestrian_new = cs_person;
+// const unsigned int Animal_new = cs_unlabeled;
+// const unsigned int Sky_new = cs_sky;
+

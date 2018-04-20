@@ -1,0 +1,3 @@
+[submodule "ecuda"]
+	path = ecuda
+	url = https://github.com/BaderLab/ecuda.git
