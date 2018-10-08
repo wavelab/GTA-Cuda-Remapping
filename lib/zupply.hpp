@@ -3443,7 +3443,7 @@ namespace zz
 			std::streambuf			*oldCerr_;
 			std::ostream			ss_;
 			std::ostringstream		buffer_;
-			char					rate_[10];
+			char					rate_[15];
 			time::Timer				timer_;
 		};
 

@@ -129,8 +129,8 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 		cv::Mat outMat = outputImg->getMat();
 
 		std::string outFileName = std::regex_replace(files[i], std::regex(image_path), output_path);
-		fs::create_directories(fs::path(outFileName).parent_path());
 		//fout << "writing " << outFileName << std::endl;
+		fs::create_directories(fs::path(outFileName).parent_path());
 		cv::imwrite(outFileName, outMat);
 
 		readTime += (float)std::chrono::duration_cast<std::chrono::milliseconds>(readEnd - readStart).count()/1000.f;
@@ -235,9 +235,9 @@ int main(int argc, char** argv )
 	for(;;)
 	{
 		std::vector<std::string> toProcess = GetImagesToProcess(image_path, output_path);
-		zz::log::ProgBar pBar(toProcess.size());
 		if(toProcess.size() > 0)
 		{
+			zz::log::ProgBar pBar(toProcess.size());
 			std::vector<std::vector<std::string>> chunks = SplitVector(toProcess, numProc);
 
 			std::vector<std::thread> threads;
