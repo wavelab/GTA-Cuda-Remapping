@@ -10,11 +10,11 @@ make
 # Run
 
 ```
-./Remapping -i <input_folder> -n <num_threads>
+./Remapping -i <input_folder> -n <num_threads> -o <output_path> -m <map_file>
 ```
 
-This will recursively search in input_folder for anything that has "png" extension and starts with "n" (from post processing).
-It will output in the same folder with "r_" instead of "n_" in the file name.
+This will recursively search in input_folder for anything that has "png" extension.
+It will output in <output_path> with the same file name and folder structure.
 
 # Requirements
 * OpenCV
