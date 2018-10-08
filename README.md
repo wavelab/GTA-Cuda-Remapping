@@ -14,7 +14,7 @@ make
 ```
 
 This will recursively search in input_folder for anything that has "png" extension.
-It will output in <output_path> with the same file name and folder structure.
+It will output in `<output_path>` with the same file name and folder structure.
 
 # Requirements
 * OpenCV
