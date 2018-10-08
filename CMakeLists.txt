@@ -19,8 +19,10 @@ set(CUDA_PROPAGATE_HOST_FLAGS ON)
 
 set(MAIN_SRC
 	"src/main.cu"
+	"lib/zupply.cpp"
 )
 include_directories("include")
+include_directories("lib")
 include_directories("ecuda/include")
 include_directories(${OpenCV_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS})
 

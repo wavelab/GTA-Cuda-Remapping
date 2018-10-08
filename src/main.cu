@@ -51,6 +51,8 @@
 
 #include "ecuda/ecuda.hpp"
 
+#include "zupply.hpp"
+
 #include "GpuMat.cuh"
 #include "GpuVector.cuh"
 #include "helpers.h"
@@ -81,7 +83,7 @@ bool hasEnding (std::string const &fullString, std::string const &ending) {
     }
 }
 
-void processFiles(std::vector<std::string> files, std::string image_path, std::string output_path, ecuda::vector<std::pair<int,int>>* d_map, std::string outfile)
+void processFiles(std::vector<std::string> files, std::string image_path, std::string output_path, ecuda::vector<std::pair<int,int>>* d_map, std::string outfile, zz::log::ProgBar* pBar)
 {
 	cudaSetDevice(device);
 	auto& fout = std::cout;
@@ -95,7 +97,7 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 	for(int i = 0; i < files.size(); i++)
 	{
 		auto readStart = std::chrono::high_resolution_clock::now();
-		fout << "reading " << files[i] << std::endl;
+		//fout << "reading " << files[i] << std::endl;
 		cv::Mat img;
 		while(!img.data)
 		{
@@ -128,10 +130,11 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 
 		std::string outFileName = std::regex_replace(files[i], std::regex(image_path), output_path);
 		fs::create_directories(fs::path(outFileName).parent_path());
-		fout << "writing " << outFileName << std::endl;
+		//fout << "writing " << outFileName << std::endl;
 		cv::imwrite(outFileName, outMat);
 
 		readTime += (float)std::chrono::duration_cast<std::chrono::milliseconds>(readEnd - readStart).count()/1000.f;
+		pBar->step();
 	}
 	auto endTime = std::chrono::high_resolution_clock::now();
 
@@ -232,6 +235,7 @@ int main(int argc, char** argv )
 	for(;;)
 	{
 		std::vector<std::string> toProcess = GetImagesToProcess(image_path, output_path);
+		zz::log::ProgBar pBar(toProcess.size());
 		if(toProcess.size() > 0)
 		{
 			std::vector<std::vector<std::string>> chunks = SplitVector(toProcess, numProc);
@@ -243,7 +247,7 @@ int main(int argc, char** argv )
 				std::stringstream ss;
 				ss << i << ".out";
 				std::string temp = ss.str();
-				threads.push_back(std::thread(processFiles, chunks[i], image_path, output_path, &d_map, temp));
+				threads.push_back(std::thread(processFiles, chunks[i], image_path, output_path, &d_map, temp, &pBar));
 			}
 
 			for(std::thread& t : threads)
