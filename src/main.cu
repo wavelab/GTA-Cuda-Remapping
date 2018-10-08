@@ -237,6 +237,7 @@ int main(int argc, char** argv )
 		std::vector<std::string> toProcess = GetImagesToProcess(image_path, output_path);
 		if(toProcess.size() > 0)
 		{
+			std::cout << "found " << toProcess.size() << " images" << std::endl;
 			zz::log::ProgBar pBar(toProcess.size());
 			std::vector<std::vector<std::string>> chunks = SplitVector(toProcess, numProc);
 
