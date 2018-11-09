@@ -73,7 +73,7 @@ namespace fs = std::experimental::filesystem;
 // 	done = true;
 // }
 
-const int device = 2;
+const int device = 0;
 
 bool hasEnding (std::string const &fullString, std::string const &ending) {
     if (fullString.length() >= ending.length()) {
