@@ -111,7 +111,7 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 			continue;
 		}
 		scratchGpuMat->load(img);
-		scratchGpuMat->mapColours(*outputImg, *d_map);)
+		scratchGpuMat->mapColours(*outputImg, *d_map);
 		
 		cv::Mat outMat = outputImg->getMat();
 
