@@ -54,25 +54,11 @@
 #include "zupply.hpp"
 
 #include "GpuMat.cuh"
-#include "GpuVector.cuh"
 #include "helpers.h"
 #include "colours.h"
 namespace fs = std::experimental::filesystem;
 
-//std::atomic_bool done = false;
-//boost::lockfree::queue<cv::Mat> matQueue(2000);
-
-// void readThread(std::vector<std::string>& all_files)
-// {
-// 	for(int i = 0; i < all_files.size(); i++)
-// 	{
-// 		std::cout << "reading " << all_files[i] << std::endl;
-// 		cv::Mat img = cv::imread(all_files[i], CV_LOAD_IMAGE_COLOR);
-// 		matQueue.push(img);
-// 	}
-// 	done = true;
-// }
-
+// TODO: add to args
 const int device = 0;
 
 bool hasEnding (std::string const &fullString, std::string const &ending) {
@@ -99,6 +85,7 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 		auto readStart = std::chrono::high_resolution_clock::now();
 		//fout << "reading " << files[i] << std::endl;
 		cv::Mat img;
+		// wait for all data to be saved to disk from game engine
 		while(!img.data)
 		{
 			try
@@ -124,7 +111,7 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 			continue;
 		}
 		scratchGpuMat->load(img);
-		scratchGpuMat->mapColours(*outputImg, *d_map); //(GpuMat<dtype>& to, GpuVector<dtype>& map)
+		scratchGpuMat->mapColours(*outputImg, *d_map);)
 		
 		cv::Mat outMat = outputImg->getMat();
 
@@ -200,6 +187,7 @@ int main(int argc, char** argv )
 	std::string mapFile;
 	int numProc = 8;
 	std::vector<int> availGpu = {0,1,2};
+	// TODO: add argparse lib
 	for (int i = 0; i < argc; i++)
 	{
 		if (strcmp(argv[i], "-i") == 0)
@@ -211,20 +199,6 @@ int main(int argc, char** argv )
 		if (strcmp(argv[i], "-m") == 0)
 			mapFile = argv[i+1];
 	}
-
-	// std::vector<std::string> all_files;
-
-	// for(auto& p: fs::recursive_directory_iterator(image_path))
-	// {
-	// 	std::string val = p.path().string();
-	// 	std::string fname = p.path().filename().string();
-	// 	if(Helpers::hasEnding(val,"png") && fname[0] == 'n')
-	// 		all_files.push_back(val);
-	// }
-
-	// std::cout << "found " << all_files.size() << " images" << std::endl;
-
-	// std::vector<std::vector<std::string>> chunks = SplitVector(all_files, numProc);
 
 	cudaSetDevice(device);
 
@@ -239,6 +213,7 @@ int main(int argc, char** argv )
 		{
 			std::cout << "found " << toProcess.size() << " images" << std::endl;
 			zz::log::ProgBar pBar(toProcess.size());
+			//TODO: use queue instead of even split
 			std::vector<std::vector<std::string>> chunks = SplitVector(toProcess, numProc);
 
 			std::vector<std::thread> threads;
@@ -255,8 +230,6 @@ int main(int argc, char** argv )
 			{
 				t.join();
 			}
-
-			//processFiles(toProcess, image_path, output_path, d_map, "out");
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 	}

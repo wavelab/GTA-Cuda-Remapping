@@ -154,6 +154,7 @@ namespace ops
                 dtype g = from[i+1];
                 dtype r = from[i+2];
                 int ind = RGB(r,g,b);//((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+                // TODO: make default value a parameter.
                 int new_ind = 0;
                 for(int j = 0; j < d_map.size(); j++)
                 {

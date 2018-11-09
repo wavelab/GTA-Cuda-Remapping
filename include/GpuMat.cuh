@@ -40,7 +40,6 @@
 
 #include "helpers.cuh"
 #include "ops.cuh"
-#include "GpuVector.cuh"
 
 template<typename dtype>
 class GpuMat
