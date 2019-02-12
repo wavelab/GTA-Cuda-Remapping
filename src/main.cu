@@ -155,14 +155,14 @@ std::vector<std::vector<T>> SplitVector(const std::vector<T>& vec, size_t n)
     return outVec;
 }
 
-std::vector<std::string> GetImagesToProcess(std::string& inputPath, std::string& outputPath)
+std::vector<std::string> GetImagesToProcess(std::string& inputPath, std::string& outputPath, std::string& suff)
 {
 	std::vector<std::string> ret;
 	for(auto& p: fs::recursive_directory_iterator(inputPath))
 	{
 		std::string curPath = p.path().string();
 		bool regFile = fs::is_regular_file(p);
-		if(regFile && hasEnding(curPath, "png"))
+		if(regFile && hasEnding(curPath, suff))
 		{
 			std::string imgPath = std::regex_replace(curPath, std::regex(inputPath), outputPath);
 
@@ -185,6 +185,7 @@ int main(int argc, char** argv )
 	std::string image_path;
 	std::string output_path;
 	std::string mapFile;
+	std::string suff = ".png";
 	int numProc = 8;
 	std::vector<int> availGpu = {0,1,2};
 	// TODO: add argparse lib
@@ -198,6 +199,8 @@ int main(int argc, char** argv )
 			numProc = atoi(argv[i+1]);
 		if (strcmp(argv[i], "-m") == 0)
 			mapFile = argv[i+1];
+		if (strcmp(argv[i], "-s") == 0)
+			suff = argv[i+1];
 	}
 
 	cudaSetDevice(device);
@@ -208,7 +211,7 @@ int main(int argc, char** argv )
 
 	for(;;)
 	{
-		std::vector<std::string> toProcess = GetImagesToProcess(image_path, output_path);
+		std::vector<std::string> toProcess = GetImagesToProcess(image_path, output_path, suff);
 		if(toProcess.size() > 0)
 		{
 			std::cout << "found " << toProcess.size() << " images" << std::endl;
