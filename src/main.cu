@@ -31,6 +31,8 @@
  *
  * ############################################################################
 */
+#define BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
+
 #include <exception>
 #include <ctime>
 #include <stdlib.h>
@@ -77,6 +79,8 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 	std::unique_ptr<GpuMat<unsigned char>> scratchGpuMat;
 	std::unique_ptr<GpuMat<unsigned char>> outputImg;
 
+	int skipped = 0;
+
 	float readTime = 0.f;
 
 	auto startTime = std::chrono::high_resolution_clock::now();
@@ -107,7 +111,9 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 		}
 		if(img.rows != scratchGpuMat->height || img.cols != scratchGpuMat->width || img.channels() != scratchGpuMat->depth)
 		{
-			fout << "skipping " << files[i] << std::endl;
+			//fout << "skipping " << files[i] << std::endl;
+			skipped++;
+			pBar->step();
 			continue;
 		}
 		scratchGpuMat->load(img);
@@ -130,6 +136,7 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 	fout << files.size() << std::endl;
 	fout << "total time: " << totalTime << " seconds" << std::endl;
 	fout << "read time: " << readTime << " seconds" << std::endl;
+	fout << "num skipped: " << skipped << std::endl;
 }
 
 template<typename T>
@@ -164,9 +171,9 @@ std::vector<std::string> GetImagesToProcess(std::string& inputPath, std::string&
 		bool regFile = fs::is_regular_file(p);
 		if(regFile && hasEnding(curPath, suff))
 		{
-			std::string imgPath = std::regex_replace(curPath, std::regex(inputPath), outputPath);
+			std::string targetPath = std::regex_replace(curPath, std::regex(inputPath), outputPath);
 
-			if(!fs::is_regular_file(imgPath))
+			if(!fs::is_regular_file(targetPath))
 			{
 				ret.push_back(curPath);
 			}
