@@ -210,6 +210,12 @@ int main(int argc, char** argv )
 			suff = argv[i+1];
 	}
 
+	std::cout << "images path: " << image_path << std::endl;
+	std::cout << "output path: " << output_path << std::endl;
+	std::cout << "mapFile: " << mapFile << std::endl;
+	std::cout << "suff: " << suff << std::endl;
+	std::cout << "numProc: " << numProc << std::endl;
+
 	cudaSetDevice(device);
 
 	std::vector<std::pair<int,int>> map = makeMap(mapFile);
@@ -241,6 +247,7 @@ int main(int argc, char** argv )
 				t.join();
 			}
 		}
+		std::cout << "pausing" << std::endl;
 		std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 	}
 
