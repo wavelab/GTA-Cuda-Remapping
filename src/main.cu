@@ -84,17 +84,19 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 	float readTime = 0.f;
 
 	auto startTime = std::chrono::high_resolution_clock::now();
+	bool initied = false;
 	for(int i = 0; i < files.size(); i++)
 	{
 		auto readStart = std::chrono::high_resolution_clock::now();
 		//fout << "reading " << files[i] << std::endl;
 		cv::Mat img;
 		// wait for all data to be saved to disk from game engine
+		int count = 0;
 		while(!img.data)
 		{
 			try
 			{
-				img = cv::imread(files[i], CV_LOAD_IMAGE_COLOR);
+				img = cv::imread(files[i], cv::IMREAD_COLOR);
 			}
 			catch(std::exception& ex)
 			{
@@ -102,12 +104,26 @@ void processFiles(std::vector<std::string> files, std::string image_path, std::s
 			}
 			if(!img.data) //only be able to parse if IEND chunk is found (i.e. transer complete)
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			if(count > 10)
+			{
+				break;
+			}
+			count++;
 		}
+		if(!img.data)
+		{
+			fout << "bad image: " << files[i] << std::endl;
+			skipped++;
+			pBar->step();
+			continue;
+		}
+
 		auto readEnd = std::chrono::high_resolution_clock::now();
-		if(i == 0)
+		if(!initied)
 		{
 			scratchGpuMat = std::unique_ptr<GpuMat<unsigned char>>(new GpuMat<unsigned char>(img.rows, img.cols, img.channels(), false));//do this to allocate memory
 			outputImg = std::unique_ptr<GpuMat<unsigned char>>(new GpuMat<unsigned char>(img.rows, img.cols, img.channels(), false));
+			initied = true;
 		}
 		if(img.rows != scratchGpuMat->height || img.cols != scratchGpuMat->width || img.channels() != scratchGpuMat->depth)
 		{

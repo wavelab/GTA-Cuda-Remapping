@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(Remapping)
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3.0 REQUIRED)
 find_package(CUDA REQUIRED)
 #find_package(TBB REQUIRED)
 
@@ -27,4 +27,4 @@ include_directories("ecuda/include")
 include_directories(${OpenCV_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS})
 
 cuda_add_executable(Remapping ${MAIN_SRC})
-target_link_libraries(Remapping ${OpenCV_LIBS} ${CUDA_LIBRARIES} stdc++fs)
+target_link_libraries(Remapping ${OpenCV_LIBS} ${CUDA_LIBRARIES} stdc++fs opencv_imgcodecs)
